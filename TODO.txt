@@ -1,0 +1,17 @@
+Backend
+- get retreive data, transform, and store in vector db (basic python scripts)
+- server scripts to process user query (Flask)
+- basic news feed api
+- build data retrival pipeline (AWS Lambda)
+- dpeloy server scripts onto serverless functions (AWS Lambda)
+
+Front end 
+- The chatbot frontend
+- design: 
+    - how should previous message be stored? 
+    - should used news title/link/content be shown?
+- news feed
+
+Other Features (if got time)
+- user personal info as context
+- user query history 
