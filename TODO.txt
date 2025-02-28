@@ -1,11 +1,15 @@
 Backend
-- get retreive data, transform, and store in vector db (basic python scripts)
-- server scripts to process user query (Flask)
+- login & home page
+- news api retrieval
 - basic news feed api
+- server scripts to process user query (Flask)
 - build data retrival pipeline (AWS Lambda)
-- dpeloy server scripts onto serverless functions (AWS Lambda)
+- deplou server scripts onto serverless functions (AWS Lambda)
+done:
+- retreive data, transform, and store in vector db (basic python scripts)
 
 Front end 
+- login and home page
 - The chatbot frontend
 - design: 
     - how should previous message be stored? 
@@ -13,5 +17,7 @@ Front end
 - news feed
 
 Other Features (if got time)
+- voice chatbot: speech-to-text & text-to-speech
 - user personal info as context
 - user query history 
+
