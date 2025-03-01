@@ -4,7 +4,7 @@ Backend
 - basic news feed api
 - server scripts to process user query (Flask)
 - build data retrival pipeline (AWS Lambda)
-- deplou server scripts onto serverless functions (AWS Lambda)
+- deploy server scripts onto serverless functions (AWS Lambda)
 done:
 - retreive data, transform, and store in vector db (basic python scripts)
 
