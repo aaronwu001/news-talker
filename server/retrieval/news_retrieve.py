@@ -8,21 +8,39 @@ import datetime
 load_dotenv()
 NEWSDATA_API_KEY = os.getenv("NEWSDATA_API_KEY")
 
-def fetch_n_pages(query, country, n):
+def fetch_n_pages(query=None, country=None, n=1):
     """
-    Fetches up to `n` pages of news articles using `read_one_page`,
+    Fetches up to n pages of news articles using `read_one_page`,
     combining them into a single dataset.
 
     Returns:
-    - A dictionary with "news" (list of articles) and "totalPagesFetched" (int).
-    - Saves the result as a JSON file in the "news_results" folder.
+
+    return_result = {
+        "news": list[newsObject], 
+        "totalPagesFetched": int
+    }
+    
+    where 
+
+    newsObject = {
+        article_id: str,
+        title: str, 
+        link: str, 
+        description:str, 
+        pubDate: str, 
+        pubDateTZ; str, 
+        image_url: str, 
+        source_name: str
+    }
+
+    Null values are represented by empty strings. 
     """
     all_news = []  # List to store all news articles
     next_page = None  # Start with the first page
     pages_fetched = 0
 
     while pages_fetched < n:
-        result = read_one_page(query=query, country=country, page=next_page)
+        result = fetch_one_page(query=query, country=country, page=next_page)
         
         # Stop if no results
         if not result or not result.get("news"):  
@@ -35,12 +53,12 @@ def fetch_n_pages(query, country, n):
 
         # Get the nextPage value
         next_page = result.get("nextPage", "")
+        print(f"next page: {next_page}")
 
         # Stop if nextPage is empty (no more pages)
         if not next_page:
             print(f"Reached last available page after {pages_fetched} pages.")
             break
-
 
     final_result = {
         "news": all_news,
@@ -49,8 +67,8 @@ def fetch_n_pages(query, country, n):
     return final_result
 
 
-def read_one_page(query=None, country=None, page=None):
-    '''
+def fetch_one_page(query=None, country=None, page=None):
+    """
     return_result = {
         news: list[newsObject], 
         nextPage: str 
@@ -59,6 +77,7 @@ def read_one_page(query=None, country=None, page=None):
     where 
 
     newsObject = {
+        article_id: str,
         title: str, 
         link: str, 
         description:str, 
@@ -69,14 +88,14 @@ def read_one_page(query=None, country=None, page=None):
     }
 
     Null values are represented by empty strings. 
-    '''
+    """
     
     if not NEWSDATA_API_KEY:
         print("Error: API key is missing. Please check environment.")
         return None
 
     api = NewsDataApiClient(apikey=NEWSDATA_API_KEY)
-    response = api.latest_api(q=query, country=country, page=page)
+    response = api.news_api(q=query, country=country, page=page)
 
     # Ensure response is valid and contains "status"
     if not response or "status" not in response:
@@ -93,6 +112,7 @@ def read_one_page(query=None, country=None, page=None):
     # Extract news articles into the desired format
     news = [
         {
+            "article_id": article.get("article_id", ""),
             "title": article.get("title", ""),
             "link": article.get("link", ""),
             "description": article.get("description", ""),
@@ -107,17 +127,18 @@ def read_one_page(query=None, country=None, page=None):
     # Construct the final return_result object
     return_result = {
         "news": news,
-        "nextPage": str(response.get("totalResults", ""))
+        "nextPage": str(response.get("nextPage", ""))
     }
 
     return return_result
 
 
 if __name__ == '__main__':
-    QUERY = "technology"
-    COUNTRY = "us"
-    N_PAGES = 2
-
+    
+    QUERY = "business"
+    COUNTRY= "us"
+    N_PAGES = 5
+    
     result = fetch_n_pages(query=QUERY, country=COUNTRY, n=N_PAGES)
 
     if result:
@@ -134,5 +155,8 @@ if __name__ == '__main__':
             json.dump(result, file, indent=4)
 
         print(f"News data saved to {filename}")
+        print(f"Article count: {len(result)}")
+
     else:
         print("No data to save.")
+

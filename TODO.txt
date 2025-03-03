@@ -21,3 +21,8 @@ Other Features (if got time)
 - user personal info as context
 - user query history 
 
+
+Resources:
+
+Newsdata API with python
+https://newsdata.io/blog/textual-data-preprocessing-using-python/
