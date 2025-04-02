@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import json
 import datetime
+import codecs
 
 # Get environment variables
 load_dotenv()
@@ -125,20 +126,20 @@ def fetch_one_page(query=None, country=None, page=None):
     ]
 
     # Construct the final return_result object
-    return_result = {
+    result = {
         "news": news,
         "nextPage": str(response.get("nextPage", ""))
     }
 
-    return return_result
+    return result
 
 
 if __name__ == '__main__':
-    
+
     QUERY = "business"
     COUNTRY= "us"
     N_PAGES = 5
-    
+
     result = fetch_n_pages(query=QUERY, country=COUNTRY, n=N_PAGES)
 
     if result:
@@ -152,10 +153,10 @@ if __name__ == '__main__':
 
         # Save JSON file
         with open(filename, "w", encoding="utf-8") as file:
-            json.dump(result, file, indent=4)
+            json.dump(result, file, indent=4, ensure_ascii=False)
 
         print(f"News data saved to {filename}")
-        print(f"Article count: {len(result)}")
+        print(f"Article count: {len(result.get("news", -1))}")
 
     else:
         print("No data to save.")
