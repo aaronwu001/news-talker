@@ -45,3 +45,6 @@ if __name__ == '__main__':
     query = "Tell me about the tech company known as Apple."
     results = pinecone_query(query)
     print(results)
+    for match in results["matches"]:
+        print(match["metadata"]["text"])
+    

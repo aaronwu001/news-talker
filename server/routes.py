@@ -1,4 +1,10 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+import sys
+import os
+sys.path.append(os.path.abspath('./generation'))
+from generation import generation_openai
+sys.path.append(os.path.abspath('./db'))
+from pinecone_query import pinecone_query
 
 app = Flask(__name__)
 
@@ -57,6 +63,24 @@ def news_feed():
     ]
     
     return jsonify(news_data)
+
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    data = request.get_json()
+    query = data.get('query')
+
+    if not query:
+        return jsonify({'error': 'Query is required'}), 400
+
+    try:
+        pc_results = pinecone_query(query)
+        context = ('\n').join([match["metadata"]["text"] for match in pc_results["matches"]])   
+        generation = generation_openai(query=query, context=context)
+        return jsonify({'generation': generation})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
