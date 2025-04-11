@@ -10,7 +10,7 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="signup"
+        name="home"
         options={{
           headerShown: false,
         }}

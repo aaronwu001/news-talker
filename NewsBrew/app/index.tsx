@@ -1,60 +1,114 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
 import { Link } from 'expo-router';
+import { useForm, Controller } from 'react-hook-form';
+import * as zod from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const authSchema = zod.object({
+  email: zod.string().email('Invalid email address'),
+  password: zod.string().min(6, 'Password must be at least 6 characters long'),
+})
 
-  const handleLogin = () => {
-    console.log('Email:', email);
-    console.log('Password:', password);
+export default function Auth() {
+  const {control, handleSubmit, formState} = useForm({
+    resolver: zodResolver(authSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    }
+  })
+
+  const signIn = (data: zod.infer<typeof authSchema>) => {
+    console.log(data);
+  };
+
+  const signUp = (data: zod.infer<typeof authSchema>) => {
+    console.log(data);
   };
 
   return (
-    <View style={styles.container}>
-      <Image 
-        source={require('../assets/images/logo.png')}
-        style={styles.logo}
-      />
-      
-      <Text style={styles.headerTitle}>NewsBrew</Text>
-      <Text style={styles.subtitle}>Stay updated with NewsBrew.</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-      
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <View style={styles.linksContainer}>
-        <TouchableOpacity>
-          <Text style={styles.link}>Forgot Password?</Text>
-        </TouchableOpacity>
-        
-        <Link href="./signup" asChild>
-          <TouchableOpacity>
-            <Text style={styles.link}>Don't have an account? Sign Up</Text>
-          </TouchableOpacity>
-        </Link>
+    <ImageBackground source={{
+      uri: 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?cs=srgb&dl=pexels-chevanon-312418.jpg&fm=jpg'
+    }}
+    style={styles.backgroundImage}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.container}>
+          <Image 
+            source={require('../assets/images/logo.png')}
+            style={styles.logo}
+          />
+          
+          <Text style={styles.headerTitle}>Welcome to NewsBrew</Text>
+          <Text style={styles.subtitle}>Please authenticate to continue.</Text>
+          
+          <Controller
+            control={control}
+            name='email'
+            render={({
+              field: {value, onChange, onBlur},
+              fieldState: {error}
+            }) => (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholderTextColor={'#aaa'}
+                  editable={!formState.isSubmitting}
+                  autoCapitalize="none"
+                />
+                {error && <Text style={{color: 'red'}}>{error.message}</Text>}
+              </>
+            )}
+          ></Controller>
+          
+          <Controller
+            control={control}
+            name='password'
+            render={({
+              field: {value, onChange, onBlur},
+              fieldState: {error}
+            }) => (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholderTextColor={'#aaa'}
+                  secureTextEntry
+                  editable={!formState.isSubmitting}
+                  autoCapitalize="none"
+                />
+                {error && <Text style={{color: 'red'}}>{error.message}</Text>}
+              </>
+            )}
+          ></Controller>
+          
+          <View style={styles.buttonsContainer}>
+            <Link href="./home" asChild>
+              <TouchableOpacity
+                style={styles.button}
+                disabled={formState.isSubmitting}>
+                <Text style={styles.buttonText}>Sign In</Text>
+              </TouchableOpacity>
+            </Link>
+            
+            <TouchableOpacity
+              style={styles.outlineButton}
+              onPress={handleSubmit(signUp)}
+              disabled={formState.isSubmitting}>
+              <Text style={styles.outlineButtonText}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -63,7 +117,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   logo: {
     width: 120,
@@ -76,13 +143,13 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#000',
+    color: '#FFF',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#000',
+    color: '#FFF',
     marginBottom: 40,
   },
   input: {
@@ -94,15 +161,34 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#fff',
   },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
   button: {
     backgroundColor: '#007bff',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 20,
+    flex: 0.48,
   },
   buttonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  outlineButton: {
+    backgroundColor: 'transparent',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#007bff',
+    flex: 0.48,
+  },
+  outlineButtonText: {
+    color: '#007bff',
     fontSize: 16,
     fontWeight: 'bold',
   },
