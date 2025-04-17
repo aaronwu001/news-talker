@@ -22,7 +22,8 @@ build/
 *.bak
 .DS_Store
 Thumbs.db
-
+# Ignore Node.js modules
+node_modules/
 # Ignore IDE and editor settings
 .vscode/
 .idea/
