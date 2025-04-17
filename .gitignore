@@ -14,7 +14,8 @@ venv/
 *.egg
 dist/
 build/
-
+# Ignore Node.js modules
+node_modules/
 # Ignore logs and temp files
 *.log
 *.swp
